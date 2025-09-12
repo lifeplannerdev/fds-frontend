@@ -15,7 +15,6 @@ import { cn } from "@/lib/utils";
 import Navbar from "../components/Navbar";
 
 const Calendar = () => {
-  console.log('✅ Calendar component is rendering');
   const navigate = useNavigate();
   const { showToast, ToastContainer } = useToast();
   
@@ -123,7 +122,6 @@ const Calendar = () => {
       }
 
       const url = `${import.meta.env.VITE_API_URL}/api/attendance/student/${selectedStudent}?year=${selectedYear}&month=${selectedMonth + 1}`;
-      console.log('📡 Fetching attendance data from:', url);
       
       const response = await fetch(url, {
         headers: {
@@ -133,14 +131,12 @@ const Calendar = () => {
       });
       
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ Response error text:', errorText);
-        
         if (response.status === 401) {
           localStorage.removeItem('authToken');
           localStorage.removeItem('user');
           throw new Error('Session expired. Please login again.');
         }
+        const errorText = await response.text();
         throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
       }
       
@@ -159,15 +155,11 @@ const Calendar = () => {
         }
         setAttendanceData(attendanceMap);
         
-        if (Object.keys(attendanceMap).length === 0) {
-          showToast('No attendance records found for this month', 'info');
-        }
       } else {
         throw new Error(data.error || 'Failed to fetch attendance data');
       }
     } catch (err) {
-      console.error('❌ Error fetching attendance data:', err);
-      showToast(`Failed to fetch attendance data: ${err.message}`, 'error');
+      console.error('Error fetching attendance data:', err);
     } finally {
       setAttendanceLoading(false);
     }
@@ -214,7 +206,15 @@ const Calendar = () => {
 
   // Save attendance data
   const saveAttendance = async () => {
-    if (!selectedDate || !selectedStudent) return;
+    if (!selectedDate || !selectedStudent) {
+      showToast('Please select a date and student', 'error');
+      return;
+    }
+
+    if (!selectedDateAttendance.status) {
+      showToast('Please select an attendance status', 'error');
+      return;
+    }
 
     try {
       setIsSavingAttendance(true);
@@ -224,18 +224,20 @@ const Calendar = () => {
         throw new Error('No authentication token found. Please login again.');
       }
 
+      const attendanceData = {
+        studentId: selectedStudent,
+        date: selectedDate.dateStr + 'T00:00:00.000Z', // Ensure proper ISO format
+        status: selectedDateAttendance.status,
+        notes: selectedDateAttendance.notes || ''
+      };
+
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/attendance`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          studentId: selectedStudent,
-          date: selectedDate.dateStr,
-          status: selectedDateAttendance.status,
-          notes: selectedDateAttendance.notes
-        })
+        body: JSON.stringify(attendanceData)
       });
 
       if (!response.ok) {
@@ -260,7 +262,7 @@ const Calendar = () => {
         }));
         
         setIsAttendanceDialogOpen(false);
-        showToast('Updated successfully', 'success');
+        showToast('Attendance updated successfully', 'success');
       } else {
         throw new Error(data.error || 'Failed to save attendance');
       }
@@ -276,13 +278,11 @@ const Calendar = () => {
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     if (!token) {
-      console.log('❌ No token found, redirecting to login');
       showToast('Please login to access this page', 'error');
       navigate('/');
       return;
     }
     
-    console.log('✅ Token found, fetching students');
     fetchStudents();
   }, [navigate]);
 
@@ -345,7 +345,6 @@ const Calendar = () => {
 
   // Error state
   if (error) {
-    console.log('❌ Error state:', error);
     return (
       <div className="min-h-screen bg-black">
         <Navbar />

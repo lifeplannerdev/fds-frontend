@@ -109,8 +109,10 @@ const Attendance = () => {
         studentId,
         date: selectedDate + 'T00:00:00.000Z', // Ensure proper ISO format
         status: data.status,
-        notes: data.notes
+        notes: data.notes || ''
       }));
+
+      console.log('Marking attendance for records:', attendanceRecords);
 
       // Mark attendance for each student one by one to better handle errors
       let successCount = 0;
@@ -119,6 +121,8 @@ const Attendance = () => {
 
       for (const record of attendanceRecords) {
         try {
+          console.log('Sending attendance record:', record);
+          
           const response = await fetch(`${import.meta.env.VITE_API_URL}/api/attendance`, {
             method: 'POST',
             headers: {
@@ -128,6 +132,8 @@ const Attendance = () => {
             body: JSON.stringify(record),
           });
           
+          console.log('Response status for student', record.studentId, ':', response.status);
+          
           if (!response.ok) {
             if (response.status === 401) {
               localStorage.removeItem('authToken');
@@ -136,10 +142,12 @@ const Attendance = () => {
               return;
             }
             const errorText = await response.text();
+            console.error('Error response:', errorText);
             throw new Error(`HTTP ${response.status}: ${errorText}`);
           }
 
           const result = await response.json();
+          console.log('Result for student', record.studentId, ':', result);
           
           if (result.success) {
             successCount++;
@@ -150,6 +158,7 @@ const Attendance = () => {
         } catch (err) {
           errorCount++;
           errors.push(`Student ${record.studentId}: ${err.message}`);
+          console.error('Error for student', record.studentId, ':', err);
         }
       }
 
