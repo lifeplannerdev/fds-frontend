@@ -42,8 +42,8 @@ const Payments = () => {
       if (!token) {
         throw new Error('No authentication token found. Please login again.');
       }
-      
-      const response = await fetch('https://fifac-backend.vercel.app/api/payments', {
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/payments`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
