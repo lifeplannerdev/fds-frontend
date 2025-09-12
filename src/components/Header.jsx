@@ -20,7 +20,7 @@ export default function Header() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:3001/api/auth/login`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -140,10 +140,7 @@ export default function Header() {
               
               <CardHeader className="space-y-1 pb-4 md:pb-6 relative z-10">
                 <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-white">Welcome Back</CardTitle>
-                <CardDescription className="text-center text-gray-500 mt-2 md:mt-4 text-xs sm:text-sm">
-                  Test account: admin<br />
-                  Test password: admin123
-                </CardDescription>
+                
               </CardHeader>
               
               <CardContent className="relative z-10">
