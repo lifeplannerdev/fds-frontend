@@ -114,9 +114,7 @@ const [isCreating, setIsCreating] = useState(false);
       return;
     }
 
-    const apiUrl = `${import.meta.env.VITE_API_URL}/api/students`;
-
-    const response = await fetch(apiUrl, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/students`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
