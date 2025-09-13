@@ -12,6 +12,6 @@ export default defineConfig({
     },
   },
   define: {
-    'import.meta.env.VITE_API_URL': JSON.stringify('http://localhost:3001','https://fds-gamma.vercel.app'),
+    'import.meta.env.VITE_API_URL': JSON.stringify('https://fds-gamma.vercel.app'),
   },
 })
