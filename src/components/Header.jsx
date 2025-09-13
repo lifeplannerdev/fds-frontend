@@ -140,7 +140,7 @@ export default function Header() {
               
               <CardHeader className="space-y-1 pb-4 md:pb-6 relative z-10">
                 <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-white">Welcome Back</CardTitle>
-                
+                <CardDescription className="text-center text-gray-300">Sign in to your account</CardDescription>
               </CardHeader>
               
               <CardContent className="relative z-10">
